@@ -12,7 +12,9 @@ from additional_functions import *
 callback_router = Router() # мы так же как и в message_handlers создаем экземпляр нашего 
 # маршрутизатора 
 PHOTO_ID_ONE = 'AgACAgIAAxkBAAOiZZWRQKHD18GVlXxmc3XkxFmR4hMAAnjhMRscK7BIt9XPfdWp4AEBAAMCAAN4AAM0BA' 
-PHOTO_ID_TWO = "AgACAgIAAxkBAAIBfmWa6HPHq5XIOxnWV6a2uYAC92b0AAJe3DEbaM7ZSAYGx_tW1zjIAQADAgADeAADNAQ"                                                                                                            # Сигнал (или запрос) отправляемый
+PHOTO_ID_TWO = "AgACAgIAAxkBAAIBfmWa6HPHq5XIOxnWV6a2uYAC92b0AAJe3DEbaM7ZSAYGx_tW1zjIAQADAgADeAADNAQ"
+PHOTO_ID_THREE = "AgACAgIAAxkBAAICbGWwE24UiAT4pQIrc9LsGF1ADA8oAAIm-TEbST6ASQKK5zr7tZwEAQADAgADeQADNAQ"# Сигнал (или запрос) отправляемый
+PHOTO_ID_FOUR = "AgACAgIAAxkBAAICiGWwH6_EFC_7PDuUpf-YsZB6wAcPAAJ6_DEbST6AScrsLIxx-SyXAQADAgADeAADNAQ"
 
 @callback_router.callback_query(VKR_States.topic)
 async def topic_procc(callback: CallbackQuery, state: FSMContext):
@@ -64,6 +66,14 @@ async def structure_proc(callback: CallbackQuery, state: FSMContext):
         await first_state_entry(cb_data=callback,
                                 state_tuple=(state, VKR_States.goal),
                                 cb_text="Цель исследования - это конечный результат, которого хотел бы достичь исследователь при завершении своей работы. 🧐")
+    elif callback.data == "obj_sbj:1":
+        await first_state_entry(cb_data=callback,
+                                state_tuple=(state, VKR_States.object),
+                                cb_text="Простыми словами 😉:\nОбъект — это что-то (кто-то), что (кого) ты планируешь изучать.\nПредмет – характеристика или определенные функции этого объекта, которые каким-то образом могут на него влиять.")
+    elif callback.data == "hypothesis:1":
+        await first_state_entry(cb_data=callback,
+                                state_tuple=(state, VKR_States.hypothesis),
+                                cb_text="Гипотеза - это научное предположение, дающее объяснение каких-либо фактов, явлений и процессов, которое надо подтвердить или опровергнуть. 🧐")
     
 @callback_router.callback_query(VKR_States.relevance)
 async def relevance_proc(callback: CallbackQuery, state: FSMContext):
@@ -154,7 +164,69 @@ async def goal_proc(callback: CallbackQuery, state: FSMContext):
             case 0:
                 await callback.message.edit_text(text="Давай по порядку", reply_markup=structure().as_markup())
                 await state.set_state(VKR_States.structure)  
-                 
+       
+@callback_router.callback_query(VKR_States.object)
+async def object_proc(callback: CallbackQuery, state: FSMContext):
+    
+    if "obj_sbj" in callback.data:
+        full_callback = callback.data.split(":")
+        page_number = int(full_callback[1])
+        cb_data = full_callback[0]
+        
+        match page_number:
+            case 1:
+                await callback.message.edit_text(text="Простыми словами 😉:\nОбъект — это что-то (кто-то), что (кого) ты планируешь изучать.\nПредмет – характеристика или определенные функции этого объекта, которые каким-то образом могут на него влиять.", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+            case 2:
+                await callback.message.edit_text(text="Объект – это процесс / явление / комплекс процессов, который ты хочешь изучить, исследовать, определить.\nНапример,\n- сообщество / группа 👩🧑\nm- погодное явление ☔️\n- банковская структура / зона управления / распределение (ресурсов, финансов, энергозатрат, рынка, и пр.) 🏦\n- философское понятие ⭐️\n- микроорганизмы, металл, материал, территориальная зона 🗿\nи т.д.", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+            case 3:
+                message_change = callback.message.edit_text(text="Предмет исследования – это часть объекта, его составляющая или компонента его системы.\nЭто могут быть любые свойства данного объекта / его характеристики, которые вы запланировали изучить, классифицировать, проанализировать, упорядочить, определить соотношение между их отдельными элементами и т.д.\nНапример,\n- некое состояние / статус объекта, которое изменяется определенным образом под влиянием факторов 📈\n- процесс изменения таких факторов ↗️\n- порядок их взаимодействия друг с другом ↔️\n- определение их характерных черт ✨\n- порядок их взаимного влияния или их влияния на объект исследования 🔄\nи т.п.", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                message_send = callback.message.answer(text="Предмет исследования – это часть объекта, его составляющая или компонента его системы.\nЭто могут быть любые свойства данного объекта / его характеристики, которые вы запланировали изучить, классифицировать, проанализировать, упорядочить, определить соотношение между их отдельными элементами и т.д.\nНапример,\n- некое состояние / статус объекта, которое изменяется определенным образом под влиянием факторов 📈\n- процесс изменения таких факторов ↗️\n- порядок их взаимодействия друг с другом ↔️\n- определение их характерных черт ✨\n- порядок их взаимного влияния или их влияния на объект исследования 🔄\nи т.п.", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                await inner_block(coroutine_obj=(message_change, message_send), state=state)
+            case 4:
+                data = await state.get_data()
+                await data["temp_menu"].delete()
+                temp_menu = await bot.send_photo(chat_id=TempData.user_id, photo=PHOTO_ID_THREE, caption="Вот несколько примеров 😇", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                await state.update_data(temp_menu=temp_menu)
+            case 5:
+                data = await state.get_data()
+                await data["temp_menu"].delete()
+                await callback.message.answer(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("obj_sbj").as_markup())
+                await state.clear()
+            case 0:
+                await callback.message.edit_text(text="Давай по порядку", reply_markup=structure().as_markup())
+                await state.set_state(VKR_States.structure)  
+          
+@callback_router.callback_query(VKR_States.hypothesis)
+async def hypothesis_proc(callback: CallbackQuery, state: FSMContext):
+    
+    if "hypothesis" in callback.data:
+        full_callback = callback.data.split(":")
+        page_number = int(full_callback[1])
+        cb_data = full_callback[0]
+        
+        match page_number:
+            case 1:
+                await callback.message.edit_text(text="Гипотеза - это научное предположение, дающее объяснение каких-либо фактов, явлений и процессов, которое надо подтвердить или опровергнуть. 🧐", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+            case 2:
+                await callback.message.edit_text(text="Виды гипотез 🤔:\n- описательные (предполагающие существование какого-либо явления / процесса)\n- объяснительные (вскрывающие причины явления / процесса)\n- описательно-объяснительные", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+            case 3:
+                message_change = callback.message.edit_text(text='Гипотеза должна:\n- быть простой (меньше возможных допущений 🤨)\n- быть проверяемой при данном уровне знаний (не бери на себя слишком много 😊)\n- содержать предположение ("если... то", "при условии, что..." 🤔)\n- не противоречить установленным научным фактам 🙅‍♀️', reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                message_send = callback.message.answer(text='Гипотеза должна:\n- быть простой (меньше возможных допущений 🤨)\n- быть проверяемой при данном уровне знаний (не бери на себя слишком много 😊)\n- содержать предположение ("если... то", "при условии, что..." 🤔)\n- не противоречить установленным научным фактам 🙅‍♀️', reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                await inner_block(coroutine_obj=(message_change, message_send), state=state)
+            case 4:
+                data = await state.get_data()
+                await data["temp_menu"].delete()
+                temp_menu = await bot.send_photo(chat_id=TempData.user_id, photo=PHOTO_ID_FOUR, caption="Вот способы построения гипотезы 🤔\nИ помни 🤓\nОдно исследование - одна гипотеза", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                await state.update_data(temp_menu=temp_menu)
+            case 5:
+                data = await state.get_data()
+                await data["temp_menu"].delete()
+                await callback.message.answer(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("hypothesis").as_markup())
+                await state.clear()
+            case 0:
+                await callback.message.edit_text(text="Давай по порядку", reply_markup=structure().as_markup())
+                await state.set_state(VKR_States.hypothesis)  
+          
 @callback_router.callback_query(lambda x: x) # только в этом случае будет происходить обработка именно 
 # запросов типа CallbackQuery, на что указывает собственно .callback_query 
 # можно заметить, что маршрутизатор пропускает любой callback-запрос 
@@ -174,6 +246,8 @@ async def button_exe(callback: CallbackQuery, state: FSMContext): # там та�
     elif callback.data == "structure":
         await callback.message.edit_text(text="Давай по порядку", reply_markup=structure().as_markup())
         await state.set_state(VKR_States.structure)
+    elif callback.data in ("course", "abstract", "article", "report"):
+        await callback.answer(text="Функция находится в разработке")
 
     
 

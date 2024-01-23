@@ -33,13 +33,13 @@ def end_of_proc(block_type: str):
     btn_back = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
     btn_bk_structure = InlineKeyboardButton(text="Вернуться к структуре", callback_data="structure")
     btn_sources = InlineKeyboardButton(text="Работа с источниками", callback_data="sources")
-    hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis")
+    hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis:1")
     
     if block_type == "theme":
         kb_end.add(btn_back, btn_ending)
     elif block_type == "actuality":
         kb_end.add(btn_ending, btn_back, btn_bk_structure, btn_sources)
-    elif block_type == "problem":
+    elif block_type in ("problem", "obj_sbj", "hypothesis"):
         kb_end.add(btn_ending, btn_back, btn_bk_structure)
     elif block_type == "goal":
         kb_end.add(btn_ending, btn_back, hypothesis, btn_bk_structure)
@@ -65,8 +65,8 @@ def structure():
     btn_actuality = InlineKeyboardButton(text="Актуальность, новизна", callback_data="actuality:1")
     btn_problem = InlineKeyboardButton(text="Проблема", callback_data="problem:1")
     btn_purpose = InlineKeyboardButton(text="Цель, задачи", callback_data="goal:1")
-    btn_obj_sbj = InlineKeyboardButton(text="Объект, предмет", callback_data="obj_sbj")
-    btn_hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis")
+    btn_obj_sbj = InlineKeyboardButton(text="Объект, предмет", callback_data="obj_sbj:1")
+    btn_hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis:1")
     btn_methods = InlineKeyboardButton(text="Методы", callback_data="methods")
     btn_back_to_vkr = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
 

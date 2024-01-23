@@ -8,4 +8,6 @@ class VKR_States(StatesGroup):
     relevance = State()
     problem = State()
     goal = State()
+    object = State()
+    hypothesis = State()
      
