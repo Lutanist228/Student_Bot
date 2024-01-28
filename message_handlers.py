@@ -28,12 +28,6 @@ async def starting_menu(message: Message, state: FSMContext):
     menu = await bot.send_message(chat_id=message.from_user.id, text="Меню", reply_markup=type_of_work().as_markup())
 
 @message_router.message(lambda x: x)
-async def photo_proc(message: Message):
-    photo_info = message.photo
-    photo_id = message.photo[-1].file_id
-    print(photo_id)
-
-@message_router.message(lambda x: x)
 async def message_del(message: Message, state: FSMContext):
     await message.delete()
 
