@@ -11,4 +11,6 @@ class VKR_States(StatesGroup):
     object = State()
     hypothesis = State()
     methods = State()
+    lit_review = State()
+    practice = State()
      

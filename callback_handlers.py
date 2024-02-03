@@ -16,6 +16,27 @@ PHOTO_ID_TWO = "AgACAgIAAxkBAAIBfmWa6HPHq5XIOxnWV6a2uYAC92b0AAJe3DEbaM7ZSAYGx_tW
 PHOTO_ID_THREE = "AgACAgIAAxkBAAICbGWwE24UiAT4pQIrc9LsGF1ADA8oAAIm-TEbST6ASQKK5zr7tZwEAQADAgADeQADNAQ"# Сигнал (или запрос) отправляемый
 PHOTO_ID_FOUR = "AgACAgIAAxkBAAICiGWwH6_EFC_7PDuUpf-YsZB6wAcPAAJ6_DEbST6AScrsLIxx-SyXAQADAgADeAADNAQ"
 
+@callback_router.callback_query(VKR_States.lit_review)
+async def lit_review(callback: CallbackQuery, state: FSMContext):
+    if callback.data == "VKR":
+        await callback.message.edit_text(reply_markup=vkr().as_markup(), text="Что именно тебе нужно по ВКР 😇?")
+        await state.clear()
+    elif callback.data in ("content_analysis", "quoting", "lit_list"):
+        await callback.answer(text="Функция находится в разработке")
+
+@callback_router.callback_query(VKR_States.practice)
+async def practice(callback: CallbackQuery, state: FSMContext):
+    if callback.data == "VKR":
+        await callback.message.edit_text(reply_markup=vkr().as_markup(), text="Что именно тебе нужно по ВКР 😇?")
+        await state.clear()
+    elif callback.data in ("doc_analysis", "survey", "expert_survey", "focus_group", 
+                           "tools", "respondents", "ethics", "passage"):
+        await callback.answer(text="Функция находится в разработке")
+    elif callback.data == "interview":
+        await callback.message.edit_text(reply_markup=survey().as_markup(), text="Как проводить интервью")
+    elif callback.data == "empirical_part":
+        await callback.message.edit_text(text="Как делать практику?\nЗдесь собраны основные практические методы исследования", reply_markup=practical_part().as_markup())
+
 @callback_router.callback_query(VKR_States.topic)
 async def topic_procc(callback: CallbackQuery, state: FSMContext):
 
@@ -386,8 +407,6 @@ async def methods_proc(callback: CallbackQuery, state: FSMContext):
                 message_two = await callback.message.answer(text="💡 Плюсом этих практических методов в дипломе считается большой охват аудитории. Ведь если удалось опросить много человек, то и шансов получить более точные данные намного выше.")
                 await state.update_data(msg_buffer=(message_one, message_two))
                     
-
-    
 @callback_router.callback_query(lambda x: x) # только в этом случае будет происходить обработка именно 
 # запросов типа CallbackQuery, на что указывает собственно .callback_query 
 # можно заметить, что маршрутизатор пропускает любой callback-запрос 
@@ -407,7 +426,13 @@ async def button_exe(callback: CallbackQuery, state: FSMContext): # там та�
     elif callback.data == "structure":
         await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=structure().as_markup())
         await state.set_state(VKR_States.structure)
-    elif callback.data in ("course", "abstract", "article", "report"):
+    elif callback.data == "sources":
+        await callback.message.edit_text(text="Литобзор и работа с источниками", reply_markup=liter_review().as_markup())
+        await state.set_state(VKR_States.lit_review)
+    elif callback.data == "empirical_part":
+        await callback.message.edit_text(text="Как делать практику?\nЗдесь собраны основные практические методы исследования", reply_markup=practical_part().as_markup())
+        await state.set_state(VKR_States.practice)
+    elif callback.data in ("course", "abstract", "article", "report", "content_analysis", "quoting", "lit_list"):
         await callback.answer(text="Функция находится в разработке")
 
     

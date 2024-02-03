@@ -49,8 +49,10 @@ def end_of_proc(block_type: str):
 
 def page_surfer(page_n, callback_data):
     kb_pages = InlineKeyboardBuilder()
+    
     next_pg = InlineKeyboardButton(text="Далее", callback_data=f"{callback_data}:{page_n + 1}")
     back_pg = InlineKeyboardButton(text="Назад", callback_data=f"{callback_data}:{page_n - 1}")
+    
     kb_pages.add(next_pg, back_pg)
     kb_pages.adjust(1)
     return kb_pages
@@ -121,3 +123,47 @@ def immertion_lvl():
     kb_immertion.add(btn_shortly, btn_fully, btn_back_to_methods)
     kb_immertion.adjust(1)
     return kb_immertion
+
+def liter_review():
+    kb_review = InlineKeyboardBuilder()
+    
+    btn_content = InlineKeyboardButton(text="Контент-анализ", callback_data="content_analysis")
+    btn_quoting = InlineKeyboardButton(text="Правила цитирования", callback_data="quoting")
+    btn_list = InlineKeyboardButton(text="Список литературы", callback_data="lit_list")
+    btn_vkr_back = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
+    
+    kb_review.add(btn_content, btn_quoting, btn_list, btn_vkr_back)
+    kb_review.adjust(1)
+    return kb_review
+
+def practical_part():
+    kb_practical = InlineKeyboardBuilder()
+    
+    btn_doc_analysis = InlineKeyboardButton(text="Анализ документов", callback_data="doc_analysis")
+    btn_survey = InlineKeyboardButton(text="Анкетирование", callback_data="survey")
+    btn_expert_survey = InlineKeyboardButton(text="Экспертный опрос", callback_data="expert_survey")
+    btn_focus_group = InlineKeyboardButton(text="Фокус-группа", callback_data="focus_group")
+    btn_interview = InlineKeyboardButton(text="Интервью", callback_data="interview")    
+    btn_vkr_back = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
+    
+    kb_practical.add(btn_doc_analysis, btn_survey, btn_expert_survey,
+                     btn_focus_group, btn_interview, btn_vkr_back)
+    kb_practical.adjust(1)
+    return kb_practical
+
+def survey():
+    kb_survey = InlineKeyboardBuilder()
+    
+    btn_tools = InlineKeyboardButton(text="Инструментарий", callback_data="tools")
+    btn_respondents = InlineKeyboardButton(text="Респонденты", callback_data="respondents")
+    btn_ethics = InlineKeyboardButton(text="Этика", callback_data="ethics")
+    btn_passage = InlineKeyboardButton(text="Проведение", callback_data="passage")
+    btn_interview = InlineKeyboardButton(text="Анализ", callback_data="interview")
+    btn_empirical_part = InlineKeyboardButton(text="Назад к практике", callback_data="empirical_part")
+    
+    kb_survey.add(btn_tools, btn_respondents, btn_ethics,
+                     btn_passage, btn_interview, btn_empirical_part)
+    kb_survey.adjust(1)
+    return kb_survey
+
+
