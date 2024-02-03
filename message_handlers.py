@@ -18,14 +18,14 @@ async def back_to_mm(message: Message, state: FSMContext):
     # data = await state.get_data()
     await state.clear() ; await message.delete()
     TempData.user_id = message.from_user.id
-    menu = await bot.send_message(chat_id=message.from_user.id, text="Меню", reply_markup=type_of_work().as_markup())                                                 
+    menu = await bot.send_message(chat_id=message.from_user.id, text="Тип научной работы", reply_markup=type_of_work().as_markup())                                                 
 
 @message_router.message(Command("start"))                                            
 async def starting_menu(message: Message, state: FSMContext):
     await state.clear()
     TempData.user_id = message.from_user.id
-    await message.answer(text="Успешный возврат в меню", reply_markup=back_to_main())
-    menu = await bot.send_message(chat_id=message.from_user.id, text="Меню", reply_markup=type_of_work().as_markup())
+    await message.answer(text="Открытие главного меню", reply_markup=back_to_main())
+    menu = await bot.send_message(chat_id=message.from_user.id, text="Тип научной работы", reply_markup=type_of_work().as_markup())
 
 @message_router.message(lambda x: x)
 async def message_del(message: Message, state: FSMContext):

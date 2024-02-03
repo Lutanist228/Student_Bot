@@ -10,4 +10,5 @@ class VKR_States(StatesGroup):
     goal = State()
     object = State()
     hypothesis = State()
+    methods = State()
      
