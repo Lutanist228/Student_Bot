@@ -78,7 +78,7 @@ def methods(methods_type: str = None):
     kb_methods = InlineKeyboardBuilder()
     
     btn_general = InlineKeyboardButton(text="Общие (теоретические)", callback_data="gen_methods:1")
-    btn_local = InlineKeyboardButton(text="Частные (эмпирические)", callback_data="loc_methods")
+    btn_local = InlineKeyboardButton(text="Частные (эмпирические)", callback_data="loc_methods:1")
     btn_bk_structure = InlineKeyboardButton(text="Вернуться к структуре", callback_data="structure")
     
     btn_analysis = InlineKeyboardButton(text="Анализ, синтез", callback_data="gen_methods:analysis")
@@ -90,15 +90,34 @@ def methods(methods_type: str = None):
     btn_abstracting = InlineKeyboardButton(text="Абастрагирование", callback_data="gen_methods:abstracting")
     btn_formalization = InlineKeyboardButton(text="Формализация", callback_data="gen_methods:formalization")
     btn_specification = InlineKeyboardButton(text="Конкретизация", callback_data="gen_methods:specification")
-    btn_back_to_methods = InlineKeyboardButton(text="Назад к видам методов", callback_data="gen_methods:back_to_methods")
-
+    btn_back_to_methods = InlineKeyboardButton(text="Назад к видам методов", callback_data="all_methods:back_to_methods")
+    btn_description = InlineKeyboardButton(text="Наблюдение, описание", callback_data="loc_methods:description")
+    btn_comparison = InlineKeyboardButton(text="Сравнение", callback_data="loc_methods:comparison")
+    btn_experiment = InlineKeyboardButton(text="Эксперимент", callback_data="loc_methods:experiment")
+    btn_measurement = InlineKeyboardButton(text="Измерение", callback_data="loc_methods:measurement")
+    btn_modeling = InlineKeyboardButton(text="Практическое моделирование", callback_data="loc_methods:modeling")
+    btn_interview = InlineKeyboardButton(text="Беседа, интервью", callback_data="loc_methods:interview")
+    btn_group = InlineKeyboardButton(text="Фокус-группа", callback_data="loc_methods:group")
+    btn_survey = InlineKeyboardButton(text="Опрос, анкетирование", callback_data="loc_methods:survey")
+    
     if methods_type == None:
         kb_methods.add(btn_general, btn_local, btn_bk_structure)
     elif methods_type == "general":
-        kb_methods.add(btn_analysis, btn_modeling, btn_analogy, btn_de_in_duction, btn_summarize, btn_classification, btn_abstracting, btn_formalization,
-                       btn_specification, btn_back_to_methods)
-    elif methods_type == "local":
-        pass
-        
+        kb_methods.add(btn_analysis, btn_modeling, btn_analogy, btn_de_in_duction, btn_summarize, 
+                       btn_classification, btn_abstracting, btn_formalization,btn_specification, btn_back_to_methods)
+    elif methods_type == "practical":
+        kb_methods.add(btn_description, btn_comparison, btn_experiment, btn_measurement, 
+                    btn_modeling,btn_interview, btn_group, btn_survey, btn_back_to_methods)
     kb_methods.adjust(1)
     return kb_methods
+
+def immertion_lvl():
+    kb_immertion = InlineKeyboardBuilder()
+    
+    btn_shortly = InlineKeyboardButton(text="Кратко о каждом методе", callback_data="loc_methods:shortly_methods")
+    btn_fully = InlineKeyboardButton(text="Подробно о практике", callback_data="loc_methods:fully_methods")
+    btn_back_to_methods = InlineKeyboardButton(text="Назад к видам методов", callback_data="all_methods:back_to_methods")
+
+    kb_immertion.add(btn_shortly, btn_fully, btn_back_to_methods)
+    kb_immertion.adjust(1)
+    return kb_immertion
