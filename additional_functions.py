@@ -34,3 +34,7 @@ async def first_state_entry(state_tuple: tuple[FSMContext, VKR_States], cb_data:
     
     await callback_query.message.edit_text(text=cb_text, reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
     await state_tuple[0].set_state(state_tuple[1])
+    
+async def message_delition(message_tuple: tuple):
+    for msg in message_tuple:
+        await msg.delete()

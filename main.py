@@ -4,7 +4,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 # aiogram
 import asyncio as asy # для запуска асинхронных функций мы пользуемся asyncio 
 
-BOT_TOKEN = "" # мы закрепляем за константой наш токен
+BOT_TOKEN = "6353873033:AAHXjfqGRdMatA9n_zWwew2VhHfBbhIhmfA" # мы закрепляем за константой наш токен
 
 dp = Dispatcher(storage=MemoryStorage()) # тут мы объявляем пустой экземпляр диспечера, в который будем все помещать
 bot = Bot(token=BOT_TOKEN) # тут мы помещаем внутрь бота токен
