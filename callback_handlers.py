@@ -11,10 +11,6 @@ from additional_functions import *
 
 callback_router = Router() # мы так же как и в message_handlers создаем экземпляр нашего 
 # маршрутизатора 
-# PHOTO_ID_ONE = "AgACAgIAAxkBAAOVZb98GSp7itr7hy__R6PHR2ZpZxsAAkPaMRtMQAFK4ZyA8YYresIBAAMCAAN4AAM0BA"
-# PHOTO_ID_TWO = "AgACAgIAAxkBAAOWZb98ULyMCl0_DoGsqPGjcCubHccAAkbaMRtMQAFKJBy1gC5zR3sBAAMCAAN4AAM0BA"
-# PHOTO_ID_THREE = "AgACAgIAAxkBAAOXZb98aYpuVUefuw7FG18fUwioaW4AAkfaMRtMQAFKjysQxR2Ya7IBAAMCAAN5AAM0BA"# Сигнал (или запрос) отправляемый
-# PHOTO_ID_FOUR = "AgACAgIAAxkBAAOYZb98hNcIF4HG5-cDHLSsy-CnsEIAAkjaMRtMQAFK_WjAcyfK7E4BAAMCAAN4AAM0BA"
 
 PHOTO_ID_ONE = 'AgACAgIAAxkBAAOiZZWRQKHD18GVlXxmc3XkxFmR4hMAAnjhMRscK7BIt9XPfdWp4AEBAAMCAAN4AAM0BA' 
 PHOTO_ID_TWO = "AgACAgIAAxkBAAIBfmWa6HPHq5XIOxnWV6a2uYAC92b0AAJe3DEbaM7ZSAYGx_tW1zjIAQADAgADeAADNAQ"
@@ -77,14 +73,52 @@ async def topic_proc(callback: CallbackQuery, state: FSMContext):
 
 @callback_router.callback_query(VKR_States.structure)
 async def structure_proc(callback: CallbackQuery, state: FSMContext):
+    full_callback = callback.data.split(":")
 
     if callback.data == "VKR":
         await callback.message.edit_text(reply_markup=vkr().as_markup(), text="Что именно тебе нужно по ВКР 😇?")
         await state.clear()
-    elif callback.data == "actuality:1":
-        await first_state_entry(cb_data=callback, 
-                                state_tuple=(state, VKR_States.relevance), 
-                                cb_text="Актуальность подчеркивает наличие проблемы, ее значимость и необходимость новых методов ее решения. 😊")
+    elif callback.data == "structure":
+        await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
+    elif "actuality" in callback.data:
+        # нужно как то сделать так, чтобы появился счетчик, считающий каждый вызов этой функции при заходе внутрь данного условия 
+        fst_cb = callback.data
+        
+        if len(full_callback) == 2:
+            await callback.message.edit_text(text="Что именно тебе нужно по актуальности", reply_markup=StructureVKR().fork(prev_callback=fst_cb).as_markup())
+        else:
+            if callback.data == "structure":
+                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
+            else:    
+                page_number = int(full_callback[2])
+                op_type = full_callback[1]
+                fork_status = full_callback[0]
+            
+                if fork_status == "theory":
+                    match page_number:
+                        case 1:
+                            await callback.message.edit_text(text="Актуальность подчеркивает наличие проблемы, ее значимость и необходимость новых методов ее решения. 😊\n\nОбрати внимание на компоненты актуальности 😉:\n- проблема, противоречие\n- необходимость действий, перемен\n- новизна\n- значимость исследования\n\nДля актуальности выделен отдельный абзац во введении. В нем нужно в нескольких предложениях подчеркнуть нерешенность проблемы, степень ее изученности и новизну, ссылаясь на другие исследования. 📜", reply_markup=page_surfer(page_n=page_number, callback_data=f"{fork_status}:{op_type}").as_markup())
+                        case 2:
+                            await callback.message.edit_text(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("actuality", "actuality").as_markup())
+                        case 0:
+                            await callback.message.edit_text(text="Что именно тебе нужно по актуальности", reply_markup=StructureVKR().fork(prev_callback=fst_cb).as_markup())
+                else:
+                    match page_number:
+                        case 1:
+                            data = await state.get_data()
+                            await data["temp_menu"].delete()
+                            temp_menu = await bot.send_photo(chat_id=TempData.user_id, photo=PHOTO_ID_TWO, caption="Что если актуальность не очевидна с первого взгляда? 😳", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                            await state.update_data(temp_menu=temp_menu)
+                        case 2:
+                            data = await state.get_data()
+                            await data["temp_menu"].delete()
+                            temp_menu = await callback.message.answer(text="Можно проанализировать следующие критерии 🤔:\n- степень изученности проблемы\n- эффективность ранних и текущих мер\n- потребности науки и отрасли.\n\nМожно посмотреть последние научные разработки по теме, частоту выхода в свет исследований в рамках данной и смежных тем, наличие текущих дискуссий. 🤓\nОбрати внимание на доступность и количество материалов по теме.\n\nИзбегай таких ошибок, как:\n- слишком сложная формулировка\n- слабая аргументация\n- несовпадение с темой\n- заимствования (плагиат) ⛔️", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                            await state.update_data(temp_menu=temp_menu)
+                        case 3:
+                            await callback.message.edit_text(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("actuality").as_markup())
+                            await state.clear()
+                        case 0:
+                            await callback.message.edit_text(text="Что именно тебе нужно по актуальности", reply_markup=StructureVKR().fork(prev_callback=original_cb).as_markup())
         
     elif callback.data == "problem:1":
         await first_state_entry(cb_data=callback,
@@ -110,40 +144,40 @@ async def structure_proc(callback: CallbackQuery, state: FSMContext):
 @callback_router.callback_query(VKR_States.relevance)
 async def relevance_proc(callback: CallbackQuery, state: FSMContext):
     
-    if "actuality" in callback.data:
+    if callback.data == "structure":
+        await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
+        await state.set_state(VKR_States.structure)  
+    else:    
         full_callback = callback.data.split(":")
-        page_number = int(full_callback[1])
-        cb_data = full_callback[0]
         
-        match page_number:
-            case 1:
-                await callback.message.edit_text(text="Актуальность подчеркивает наличие проблемы, ее значимость и необходимость новых методов ее решения. 😊", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-            case 2:
-                message_send = callback.message.answer(text="Обрати внимание на компоненты актуальности 😉:\n- проблема, противоречие\n- необходимость действий, перемен\n- новизна\n- значимость исследования", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-                message_change = callback.message.edit_text(text="Обрати внимание на компоненты актуальности 😉:\n- проблема, противоречие\n- необходимость действий, перемен\n- новизна\n- значимость исследования", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-                await inner_block(coroutine_obj=(message_change, message_send), state=state)
-            case 3:
-                data = await state.get_data()
-                await data["temp_menu"].delete()
-                temp_menu = await bot.send_photo(chat_id=TempData.user_id, photo=PHOTO_ID_TWO, caption="Что если актуальность не очевидна с первого взгляда? 😳", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-                await state.update_data(temp_menu=temp_menu)
-            case 4:
-                data = await state.get_data()
-                await data["temp_menu"].delete()
-                temp_menu = await callback.message.answer(text="Можно проанализировать следующие критерии 🤔:\n- степень изученности проблемы\n- эффективность ранних и текущих мер\n- потребности науки и отрасли", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-                await state.update_data(temp_menu=temp_menu)
-            case 5:
-                await callback.message.edit_text(text="Можно посмотреть последние научные разработки по теме, частоту выхода в свет исследований в рамках данной и смежных тем, наличие текущих дискуссий. 🤓\nОбрати внимание на доступность и количество материалов по теме.", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-            case 6:
-                await callback.message.edit_text(text="Избегай таких ошибок, как:\n- слишком сложная формулировка\n- слабая аргументация\n- несовпадение с темой\n- заимствования (плагиат) ⛔️", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-            case 7:
-                await callback.message.edit_text(text="Для актуальности выделен отдельный абзац во введении. В нем нужно в нескольких предложениях подчеркнуть нерешенность проблемы, степень ее изученности и новизну, ссылаясь на другие исследования. 📜", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
-            case 8:
-                await callback.message.edit_text(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("actuality").as_markup())
-                await state.clear()
-            case 0:
-                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=structure().as_markup())
-                await state.set_state(VKR_States.structure)
+        original_cb = callback.data
+        page_number = int(full_callback[2])
+        op_type = full_callback[1]
+        fork_status = full_callback[0]
+    
+        if fork_status == "theory":
+            match page_number:
+                case 1:
+                    message_send = callback.message.answer(text="Актуальность подчеркивает наличие проблемы, ее значимость и необходимость новых методов ее решения. 😊\n\nОбрати внимание на компоненты актуальности 😉:\n- проблема, противоречие\n- необходимость действий, перемен\n- новизна\n- значимость исследования\n\nДля актуальности выделен отдельный абзац во введении. В нем нужно в нескольких предложениях подчеркнуть нерешенность проблемы, степень ее изученности и новизну, ссылаясь на другие исследования. 📜", reply_markup=page_surfer(page_n=page_number, callback_data=f"{fork_status}:{op_type}").as_markup())
+                case 0:
+                    await callback.message.edit_text(text="Что именно тебе нужно по актуальности", reply_markup=StructureVKR().fork(prev_callback=original_cb).as_markup())
+        else:
+            match page_number:
+                case 1:
+                    data = await state.get_data()
+                    await data["temp_menu"].delete()
+                    temp_menu = await bot.send_photo(chat_id=TempData.user_id, photo=PHOTO_ID_TWO, caption="Что если актуальность не очевидна с первого взгляда? 😳", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                    await state.update_data(temp_menu=temp_menu)
+                case 2:
+                    data = await state.get_data()
+                    await data["temp_menu"].delete()
+                    temp_menu = await callback.message.answer(text="Можно проанализировать следующие критерии 🤔:\n- степень изученности проблемы\n- эффективность ранних и текущих мер\n- потребности науки и отрасли.\n\nМожно посмотреть последние научные разработки по теме, частоту выхода в свет исследований в рамках данной и смежных тем, наличие текущих дискуссий. 🤓\nОбрати внимание на доступность и количество материалов по теме.\n\nИзбегай таких ошибок, как:\n- слишком сложная формулировка\n- слабая аргументация\n- несовпадение с темой\n- заимствования (плагиат) ⛔️", reply_markup=page_surfer(page_n=page_number, callback_data=cb_data).as_markup())
+                    await state.update_data(temp_menu=temp_menu)
+                case 3:
+                    await callback.message.edit_text(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("actuality").as_markup())
+                    await state.clear()
+                case 0:
+                    await callback.message.edit_text(text="Что именно тебе нужно по актуальности", reply_markup=StructureVKR().fork(prev_callback=original_cb).as_markup())
       
 @callback_router.callback_query(VKR_States.problem)
 async def problem_proc(callback: CallbackQuery, state: FSMContext):
@@ -166,7 +200,7 @@ async def problem_proc(callback: CallbackQuery, state: FSMContext):
                 await callback.message.edit_text(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("problem").as_markup())
                 await state.clear()
             case 0:
-                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=structure().as_markup())
+                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
                 await state.set_state(VKR_States.structure)
               
 @callback_router.callback_query(VKR_States.goal)
@@ -194,7 +228,7 @@ async def goal_proc(callback: CallbackQuery, state: FSMContext):
                 await callback.message.edit_text(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("goal").as_markup())
                 await state.clear()
             case 0:
-                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=structure().as_markup())
+                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
                 await state.set_state(VKR_States.structure)  
        
 @callback_router.callback_query(VKR_States.object)
@@ -225,7 +259,7 @@ async def object_proc(callback: CallbackQuery, state: FSMContext):
                 await callback.message.answer(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("obj_sbj").as_markup())
                 await state.clear()
             case 0:
-                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=structure().as_markup())
+                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
                 await state.set_state(VKR_States.structure)  
           
 @callback_router.callback_query(VKR_States.hypothesis)
@@ -256,7 +290,7 @@ async def hypothesis_proc(callback: CallbackQuery, state: FSMContext):
                 await callback.message.answer(text="Чем я ещё могу тебе помочь?", reply_markup=end_of_proc("hypothesis").as_markup())
                 await state.clear()
             case 0:
-                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=structure().as_markup())
+                await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
                 await state.set_state(VKR_States.structure)  
           
 @callback_router.callback_query(VKR_States.methods)
@@ -438,7 +472,7 @@ async def button_exe(callback: CallbackQuery, state: FSMContext): # там та�
     elif callback.data == "proc_end":
         await callback.message.edit_text(text="Всегда рад помочь! Желаю удачи!🍀")
     elif callback.data == "structure":
-        await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=structure().as_markup())
+        await callback.message.edit_text(text="Давай разберёмся со Структурой ВКР 🧐", reply_markup=StructureVKR().structure().as_markup())
         await state.set_state(VKR_States.structure)
     elif callback.data == "sources":
         await callback.message.edit_text(text="Литобзор и работа с источниками", reply_markup=liter_review().as_markup())

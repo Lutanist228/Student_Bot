@@ -28,23 +28,24 @@ def vkr():
     kb_about_vkr.adjust(1) 
     return kb_about_vkr
 
-def end_of_proc(block_type: str):
+def end_of_proc(block_type: str, op_type: str = "none"):
     kb_end = InlineKeyboardBuilder()
 
     btn_ending = InlineKeyboardButton(text="Спасибо, на этом все", callback_data="proc_end")
     btn_back = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
-    btn_bk_structure = InlineKeyboardButton(text="Вернуться к структуре", callback_data="structure")
-    btn_sources = InlineKeyboardButton(text="Работа с источниками", callback_data="sources")
+    btn_bk_structure = InlineKeyboardButton(text="Назад к введению", callback_data="structure")
+    # btn_sources = InlineKeyboardButton(text="Работа с источниками", callback_data="sources")
+    btn_bk_fork = InlineKeyboardButton(text="Назад к выбору методологии", callback_data=f"theory:{op_type}:0")
     hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis:1")
     
     if block_type == "theme":
-        kb_end.add(btn_back, btn_ending)
+        kb_end.add(btn_bk_fork, btn_back, btn_ending)
     elif block_type == "actuality":
-        kb_end.add(btn_ending, btn_back, btn_bk_structure, btn_sources)
+        kb_end.add(btn_bk_fork, btn_ending, btn_back, btn_bk_structure)
     elif block_type in ("problem", "obj_sbj", "hypothesis"):
-        kb_end.add(btn_ending, btn_back, btn_bk_structure)
+        kb_end.add(btn_bk_fork, btn_ending, btn_back, btn_bk_structure)
     elif block_type == "goal":
-        kb_end.add(btn_ending, btn_back, hypothesis, btn_bk_structure)
+        kb_end.add(btn_bk_fork, btn_ending, btn_back, hypothesis, btn_bk_structure)
 
     kb_end.adjust(1)
     return kb_end
@@ -64,26 +65,41 @@ def back_to_main():
     main_menu_kb = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     return main_menu_kb
 
-def structure():
-    kb_structure = InlineKeyboardBuilder()
-    btn_theme = InlineKeyboardButton(text="Тема", callback_data="theme:1")
-    btn_actuality = InlineKeyboardButton(text="Актуальность, новизна", callback_data="actuality:1")
-    btn_problem = InlineKeyboardButton(text="Проблема", callback_data="problem:1")
-    btn_purpose = InlineKeyboardButton(text="Цель, задачи", callback_data="goal:1")
-    btn_obj_sbj = InlineKeyboardButton(text="Объект, предмет", callback_data="obj_sbj:1")
-    btn_hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis:1")
-    btn_back_to_vkr = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
+class StructureVKR():
+    
+    def __init__(self) -> None:
+        self.btn_theme = InlineKeyboardButton(text="Тема", callback_data="theme:1")
+        self.btn_actuality = InlineKeyboardButton(text="Актуальность, новизна", callback_data="actuality:1")
+        self.btn_problem = InlineKeyboardButton(text="Проблема", callback_data="problem:1")
+        self.btn_purpose = InlineKeyboardButton(text="Цель, задачи", callback_data="goal:1")
+        self.btn_obj_sbj = InlineKeyboardButton(text="Объект, предмет", callback_data="obj_sbj:1")
+        self.btn_hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis:1")
+        self.btn_back_to_vkr = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
+        self.btn_bk_structure = InlineKeyboardButton(text="Назад к введению", callback_data="structure")
 
-    kb_structure.add(btn_theme, btn_actuality, btn_problem, btn_purpose, btn_obj_sbj, btn_hypothesis, btn_back_to_vkr)
-    kb_structure.adjust(1)
-    return kb_structure 
-
+    def structure(self):
+        kb_structure = InlineKeyboardBuilder()
+        
+        kb_structure.add(self.btn_theme, self.btn_actuality, self.btn_problem, 
+                         self.btn_purpose, self.btn_obj_sbj, self.btn_hypothesis, self.btn_back_to_vkr)
+        kb_structure.adjust(1)
+        return kb_structure 
+    
+    def fork(self, prev_callback):
+        kb_fork = InlineKeyboardBuilder()
+        theor_pt = InlineKeyboardButton(text="Теоретическая часть", callback_data=f"theory:{prev_callback}")
+        emphir_pt = InlineKeyboardButton(text="Эмпирическая часть", callback_data=f"practice:{prev_callback}") 
+        
+        kb_fork.add(theor_pt, emphir_pt, self.btn_bk_structure)
+        kb_fork.adjust(1)
+        return kb_fork
+        
 def methods(methods_type: str = None):
     kb_methods = InlineKeyboardBuilder()
     
     btn_general = InlineKeyboardButton(text="Общие (теоретические)", callback_data="gen_methods:1")
     btn_local = InlineKeyboardButton(text="Частные (эмпирические)", callback_data="loc_methods:1")
-    btn_bk_structure = InlineKeyboardButton(text="Вернуться к структуре", callback_data="structure")
+    btn_bk_structure = InlineKeyboardButton(text="Назад к ВКР", callback_data="structure")
     
     btn_analysis = InlineKeyboardButton(text="Анализ, синтез", callback_data="gen_methods:analysis")
     btn_modeling = InlineKeyboardButton(text="Моделирование", callback_data="gen_methods:modeling")
