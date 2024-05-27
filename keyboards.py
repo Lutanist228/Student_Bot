@@ -41,11 +41,11 @@ def end_of_proc(block_type: str, op_type: str = "none"):
     if block_type == "theme":
         kb_end.add(btn_bk_fork, btn_back, btn_ending)
     elif block_type == "actuality":
-        kb_end.add(btn_bk_fork, btn_ending, btn_back, btn_bk_structure)
+        kb_end.add(btn_bk_fork, btn_bk_structure, btn_back, btn_ending)
     elif block_type in ("problem", "obj_sbj", "hypothesis"):
-        kb_end.add(btn_bk_fork, btn_ending, btn_back, btn_bk_structure)
+        kb_end.add(btn_bk_fork, btn_bk_structure, btn_back, btn_ending)
     elif block_type == "goal":
-        kb_end.add(btn_bk_fork, btn_ending, btn_back, hypothesis, btn_bk_structure)
+        kb_end.add(btn_bk_fork, btn_back, hypothesis, btn_bk_structure, btn_ending)
 
     kb_end.adjust(1)
     return kb_end

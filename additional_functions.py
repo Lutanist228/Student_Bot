@@ -38,3 +38,9 @@ async def first_state_entry(state_tuple: tuple[FSMContext, VKR_States], cb_data:
 async def message_delition(message_tuple: tuple):
     for msg in message_tuple:
         await msg.delete()
+        
+
+            
+        
+        
+        
