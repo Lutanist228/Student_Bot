@@ -35,14 +35,10 @@ def end_of_proc(block_type: str, op_type: str = "none"):
     btn_back = InlineKeyboardButton(text="Назад к ВКР", callback_data="VKR")
     btn_bk_structure = InlineKeyboardButton(text="Назад к введению", callback_data="structure")
     # btn_sources = InlineKeyboardButton(text="Работа с источниками", callback_data="sources")
-    btn_bk_fork = InlineKeyboardButton(text="Назад к выбору методологии", callback_data=f"theory:{op_type}:0")
+    btn_bk_fork = InlineKeyboardButton(text="Назад к теории\практике", callback_data=f"theory:{op_type}:0")
     hypothesis = InlineKeyboardButton(text="Гипотеза", callback_data="hypothesis:1")
     
-    if block_type == "theme":
-        kb_end.add(btn_bk_fork, btn_back, btn_ending)
-    elif block_type == "actuality":
-        kb_end.add(btn_bk_fork, btn_bk_structure, btn_back, btn_ending)
-    elif block_type in ("problem", "obj_sbj", "hypothesis"):
+    if block_type in ("problem", "obj_sbj", "hypothesis", "actuality", "theme"):
         kb_end.add(btn_bk_fork, btn_bk_structure, btn_back, btn_ending)
     elif block_type == "goal":
         kb_end.add(btn_bk_fork, btn_back, hypothesis, btn_bk_structure, btn_ending)
